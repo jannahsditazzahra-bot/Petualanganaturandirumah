@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Game Aturan di Rumahku - SDIT AZ-ZAHRA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Fredoka for Kids friendly look -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Bounce & Pulse Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fbbf24;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-sky-300 via-amber-100 to-emerald-200 min-h-screen flex flex-col items-center justify-between p-2 sm:p-4 text-slate-800 antialiased overflow-x-hidden">
+
+    <!-- TOP HEADER -->
+    <header class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl p-3 shadow-lg border-4 border-amber-300 text-center mb-2 flex flex-col items-center relative">
+        <!-- Audio toggle -->
+        <button id="soundToggle" onclick="toggleSound()" class="absolute top-2 right-2 bg-amber-100 hover:bg-amber-200 text-amber-700 p-2 rounded-full text-xs font-bold border-2 border-amber-400 flex items-center gap-1 shadow">
+            <span id="soundIcon">🔊</span>
+        </button>
+
+        <div class="flex items-center gap-2 mb-1">
+            <span class="text-2xl">🏫</span>
+            <h1 class="text-xl sm:text-2xl font-bold text-emerald-700 tracking-wide">SDIT AZ-ZAHRA</h1>
+        </div>
+        <p class="text-xs sm:text-sm font-semibold text-amber-600 uppercase tracking-wider">Pendidikan Pancasila • Kelas 1 SD</p>
+        <p class="text-xs text-sky-700 font-bold mt-0.5 bg-sky-100 px-3 py-0.5 rounded-full border border-sky-300">
+            Materi: Aturan di Rumahku
+        </p>
+    </header>
+
+    <!-- MAIN CONTAINER (MOBILE FRIENDLY CARD) -->
+    <main class="w-full max-w-md flex-grow flex flex-col justify-center my-auto">
+
+        <!-- SCREEN 1: WELCOME & STUDENT INFO -->
+        <section id="screenWelcome" class="bg-white rounded-3xl p-5 shadow-2xl border-4 border-emerald-400 text-center animate-pop">
+            <div class="w-24 h-24 mx-auto mb-3 animate-float">
+                <!-- SVG Cute School Kids Mascot -->
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                    <circle cx="50" cy="50" r="45" fill="#FEF08A" stroke="#F59E0B" stroke-width="4"/>
+                    <!-- Kid Face -->
+                    <circle cx="50" cy="45" r="28" fill="#FDE68A"/>
+                    <!-- Eyes -->
+                    <circle cx="40" cy="42" r="4" fill="#1E293B"/>
+                    <circle cx="60" cy="42" r="4" fill="#1E293B"/>
+                    <!-- Cheeks -->
+                    <circle cx="34" cy="48" r="4" fill="#F43F5E" opacity="0.5"/>
+                    <circle cx="66" cy="48" r="4" fill="#F43F5E" opacity="0.5"/>
+                    <!-- Smile -->
+                    <path d="M 40 52 Q 50 62 60 52" stroke="#1E293B" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <!-- Muslim Cap / Hijab outline style -->
+                    <path d="M 22 38 Q 50 15 78 38 Q 50 25 22 38 Z" fill="#10B981"/>
+                    <!-- Star decor -->
+                    <polygon points="50,5 53,12 60,12 55,16 57,23 50,19 43,23 45,16 40,12 47,12" fill="#F59E0B"/>
+                </svg>
+            </div>
+
+            <h2 class="text-2xl font-bold text-amber-600 mb-1">Assalamu'alaikum! 👋</h2>
+            <p class="text-sm text-slate-600 mb-4">Yuk, belajar mengenal <b>Aturan di Rumah</b> sambil bermain game seru!</p>
+
+            <form onsubmit="startGame(event)" class="space-y-3 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1 ml-1">Nama Lengkap Siswa:</label>
+                    <input type="text" id="studentName" required placeholder="Tulis namamu di sini..." class="w-full px-4 py-3 rounded-xl border-2 border-amber-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-semibold bg-amber-50/50">
+                </div>
+
+                <button type="submit" class="w-full mt-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transform active:scale-95 transition text-base flex items-center justify-center gap-2 border-b-4 border-emerald-700">
+                    <span>🚀</span> MULAI BERMAIN <span>🚀</span>
+                </button>
+            </form>
+
+            <div class="mt-5 pt-3 border-t border-slate-200 text-xs text-slate-500 font-medium">
+                💖 Dikembangkan oleh <span class="font-bold text-amber-600">Bunda Ira</span>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: LEVEL 1 (MATCHING GAME) -->
+        <section id="screenLevel1" class="hidden bg-white rounded-3xl p-4 shadow-2xl border-4 border-amber-400">
+            <!-- Level Header -->
+            <div class="flex justify-between items-center mb-3 bg-amber-50 p-2.5 rounded-2xl border border-amber-200">
+                <div>
+                    <span class="text-xs bg-amber-400 text-amber-900 font-bold px-2 py-0.5 rounded-md">LEVEL 1</span>
+                    <h3 class="text-sm font-bold text-slate-800">Pasangkan Aturan & Gambar!</h3>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-500 font-semibold">Skor:</span>
+                    <span id="scoreL1" class="text-lg font-bold text-emerald-600 block leading-none">0</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-600 mb-3 text-center bg-sky-50 py-1.5 px-2 rounded-xl border border-sky-200">
+                👉 <b>Cara Bermain:</b> Tap 1 Teks Aturan (Kiri), lalu Tap Gambar yang Cocok (Kanan)!
+            </p>
+
+            <!-- Matching Grid Container -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <!-- Left Column: Rule Cards -->
+                <div class="space-y-2" id="rulesList">
+                    <!-- Dynamic Rule Buttons -->
+                </div>
+
+                <!-- Right Column: Picture Cards -->
+                <div class="space-y-2" id="picsList">
+                    <!-- Dynamic Picture Cards -->
+                </div>
+            </div>
+
+            <button id="btnNextLevel" onclick="goToLevel2()" class="hidden w-full mt-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg text-sm flex items-center justify-center gap-2 animate-bounce border-b-4 border-orange-700">
+                <span>Lanjut ke Level 2</span> ➡️
+            </button>
+        </section>
+
+        <!-- SCREEN 3: LEVEL 2 (CORRECT VS INCORRECT CHOICE) -->
+        <section id="screenLevel2" class="hidden bg-white rounded-3xl p-4 shadow-2xl border-4 border-sky-400">
+            <!-- Level Header -->
+            <div class="flex justify-between items-center mb-3 bg-sky-50 p-2.5 rounded-2xl border border-sky-200">
+                <div>
+                    <span class="text-xs bg-sky-400 text-sky-900 font-bold px-2 py-0.5 rounded-md">LEVEL 2</span>
+                    <h3 class="text-sm font-bold text-slate-800">Pilih Gambar yang Sesuai!</h3>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-500 font-semibold">Soal:</span>
+                    <span id="quizProgress" class="text-sm font-bold text-sky-600 block leading-none">1 / 5</span>
+                </div>
+            </div>
+
+            <!-- Quiz Card -->
+            <div id="quizContainer" class="bg-amber-50/60 p-3 rounded-2xl border-2 border-amber-200 mb-2">
+                <h4 id="quizQuestion" class="text-sm font-bold text-center text-slate-800 mb-3 min-h-[40px] flex items-center justify-center">
+                    Loading soal...
+                </h4>
+
+                <!-- Options Grid (Always 2 choices with dynamic SVG + caption below) -->
+                <div class="grid grid-cols-2 gap-3" id="quizOptions">
+                    <!-- Dynamic Option Buttons -->
+                </div>
+            </div>
+
+            <!-- Feedback Alert -->
+            <div id="quizFeedback" class="min-h-[36px] text-center font-bold text-xs py-1.5 px-3 rounded-xl transition-all opacity-0">
+                -
+            </div>
+        </section>
+
+        <!-- SCREEN 4: FINAL RESULTS & SUBMISSION -->
+        <section id="screenResult" class="hidden bg-white rounded-3xl p-5 shadow-2xl border-4 border-yellow-400 text-center animate-pop">
+            <div class="text-4xl mb-1">🎉 🏆 🎉</div>
+            <h2 class="text-2xl font-extrabold text-amber-600 mb-1">ALHAMDULILLAH!</h2>
+            <p class="text-xs text-slate-600 mb-3">Kamu telah menyelesaikan Game Aturan di Rumah!</p>
+
+            <!-- Certificate Box -->
+            <div class="bg-gradient-to-b from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-4 mb-4 shadow-inner">
+                <p class="text-xs font-bold text-amber-800 uppercase tracking-widest">Siswa Hebat Taat Aturan</p>
+                <h3 id="resStudentName" class="text-lg font-black text-emerald-700 my-1">Nama Siswa</h3>
+                <p id="resStudentClass" class="text-xs font-bold text-slate-500 mb-3">Kelas 1 SDIT AZ-ZAHRA</p>
+
+                <div class="grid grid-cols-2 gap-2 bg-white p-2.5 rounded-xl border border-amber-200 text-xs">
+                    <div class="p-1">
+                        <span class="text-slate-500 block">Level 1:</span>
+                        <span id="resScore1" class="text-base font-extrabold text-emerald-600">100</span>
+                    </div>
+                    <div class="p-1">
+                        <span class="text-slate-500 block">Level 2:</span>
+                        <span id="resScore2" class="text-base font-extrabold text-emerald-600">100</span>
+                    </div>
+                </div>
+
+                <div class="mt-3 flex justify-center items-center gap-1 text-2xl" id="starRating">
+                    ⭐ ⭐ ⭐
+                </div>
+                <p id="resMessage" class="text-xs font-bold text-amber-700 mt-2">MaaSyaaAllah! Hasil Sangat Sempurna!</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <!-- PETUNJUK CARA MENGIRIM LAPORAN -->
+                <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-3 text-left shadow-sm">
+                    <p class="text-xs font-bold text-amber-900 mb-1 flex items-center gap-1">
+                        <span>💡</span> <span>Cara Mengirim Laporan ke Bunda Ira:</span>
+                    </p>
+                    <ol class="text-[11px] text-slate-700 space-y-1 list-decimal pl-4 font-medium">
+                        <li>Tekan tombol hijau <b>"Salin Laporan Nilai"</b>.</li>
+                        <li>Buka aplikasi <b>WhatsApp</b> di HP.</li>
+                        <li>Cari nomor <b>Bunda Ira (0858-4568-0181)</b>.</li>
+                        <li><b>Tempel (Paste)</b> lalu kirimkan pesannya!</li>
+                    </ol>
+                </div>
+
+                <!-- Tombol Utama Salin Laporan -->
+                <button type="button" onclick="copyResultText()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg text-sm flex items-center justify-center gap-2 border-b-4 border-emerald-700 transition active:scale-95">
+                    <span>📋</span>
+                    <span>Salin Laporan Nilai</span>
+                </button>
+
+                <!-- Notifikasi Salin -->
+                <div id="copyToast" class="hidden text-xs font-bold text-emerald-800 bg-emerald-100 p-2.5 rounded-xl border-2 border-emerald-400 animate-pop">
+                    ✅ Laporan berhasil disalin! Sekarang buka WhatsApp & tempel (paste) pesan ke Bunda Ira.
+                </div>
+
+                <button type="button" onclick="restartGame()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1 border border-slate-300">
+                    <span>🔄</span>
+                    <span>Main Lagi</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full max-w-md text-center py-2 text-[10px] sm:text-xs text-slate-600 font-medium">
+        SDIT AZ-ZAHRA • Game Pendidikan Pancasila Kelas 1 SD<br>
+        Dibuat oleh <span class="font-bold text-amber-700">Bunda Ira</span> ❤️
+    </footer>
+
+    <!-- JAVASCRIPT GAME LOGIC -->
+    <script>
+        /* ===================================================
+           AUDIO SYNTHESIZER (WEB AUDIO API)
+           No external audio files needed - 100% reliable!
+        =================================================== */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundIcon').innerText = soundEnabled ? '🔊' : '🔇';
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                // Happy ascending tones
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.15);
+                });
+            } else if (type === 'wrong') {
+                // Low gentle buzz
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'click') {
+                // Subtle pop
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'win') {
+                // Fanfare
+                const victoryNotes = [440, 554.37, 659.25, 880];
+                victoryNotes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+                    gain.gain.setValueAtTime(0.25, now + idx * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.12);
+                    osc.stop(now + idx * 0.12 + 0.3);
+                });
+            }
+        }
+
+        /* ===================================================
+           SVG GRAPHICS GENERATOR FOR RULES
+           Handcrafted cartoon illustrations + Captions
+        =================================================== */
+        const SVG_GRAPHICS = {
+            bangun_pagi: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Sun -->
+                    <circle cx="50" cy="35" r="18" fill="#FBBF24"/>
+                    <path d="M50 10 V 15 M50 55 V 60 M25 35 H 30 M70 35 H 75 M32 17 L36 21 M64 49 L68 53 M32 53 L36 49 M64 21 L68 17" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+                    <!-- Alarm Clock -->
+                    <circle cx="50" cy="65" r="18" fill="#EF4444" stroke="#B91C1C" stroke-width="2"/>
+                    <circle cx="50" cy="65" r="14" fill="#FFFFFF"/>
+                    <!-- Hands pointing to 05:00 -->
+                    <path d="M50 65 L50 55 M50 65 L43 70" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- Bells -->
+                    <path d="M35 50 A 5 5 0 0 1 42 46" fill="none" stroke="#B91C1C" stroke-width="3"/>
+                    <path d="M65 50 A 5 5 0 0 0 58 46" fill="none" stroke="#B91C1C" stroke-width="3"/>
+                </svg>`,
+
+            rapikan_kamar: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Bed Headboard -->
+                    <rect x="15" y="30" width="70" height="50" rx="4" fill="#93C5FD"/>
+                    <!-- Mattress/Blanket neatly folded -->
+                    <rect x="15" y="45" width="70" height="35" rx="4" fill="#60A5FA"/>
+                    <rect x="15" y="45" width="70" height="15" fill="#3B82F6"/>
+                    <!-- Pillow -->
+                    <rect x="25" y="33" width="22" height="12" rx="3" fill="#FFFFFF" stroke="#93C5FD" stroke-width="2"/>
+                    <rect x="53" y="33" width="22" height="12" rx="3" fill="#FFFFFF" stroke="#93C5FD" stroke-width="2"/>
+                    <!-- Teddy Bear -->
+                    <circle cx="50" cy="55" r="7" fill="#D97706"/>
+                    <circle cx="45" cy="50" r="3" fill="#D97706"/>
+                    <circle cx="55" cy="50" r="3" fill="#D97706"/>
+                    <!-- Sparkle clean -->
+                    <path d="M 75 25 L 77 30 L 82 32 L 77 34 L 75 39 L 73 34 L 68 32 L 73 30 Z" fill="#F59E0B"/>
+                </svg>`,
+
+            kebersihan_diri: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Toothbrush & Soap Bubbles -->
+                    <rect x="20" y="45" width="50" height="8" rx="4" fill="#10B981" transform="rotate(-25 45 49)"/>
+                    <rect x="58" y="38" width="14" height="10" rx="2" fill="#FFFFFF" transform="rotate(-25 45 49)"/>
+                    <!-- Water drops & bubbles -->
+                    <circle cx="30" cy="30" r="8" fill="#38BDF8" opacity="0.7"/>
+                    <circle cx="65" cy="25" r="11" fill="#38BDF8" opacity="0.6"/>
+                    <circle cx="75" cy="45" r="6" fill="#38BDF8" opacity="0.8"/>
+                    <circle cx="68" cy="22" r="3" fill="#FFFFFF"/>
+                    <!-- Sparkles -->
+                    <path d="M 35 65 L 37 70 L 42 71 L 37 73 L 35 78 L 33 73 L 28 71 L 33 70 Z" fill="#F59E0B"/>
+                </svg>`,
+
+            salat_awal_waktu: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Sajadah / Prayer Mat -->
+                    <rect x="25" y="20" width="50" height="70" rx="6" fill="#059669" stroke="#10B981" stroke-width="3"/>
+                    <!-- Arch pattern inside sajadah -->
+                    <path d="M 32 50 Q 50 30 68 50 L 68 80 L 32 80 Z" fill="#047857"/>
+                    <!-- Mosque dome icon on mat -->
+                    <path d="M 42 45 Q 50 35 58 45 Z" fill="#FBBF24"/>
+                    <!-- Fringe / Rumbai sajadah -->
+                    <path d="M 25 17 L 25 20 M 35 17 L 35 20 M 45 17 L 45 20 M 55 17 L 55 20 M 65 17 L 65 20 M 75 17 L 75 20" stroke="#FBBF24" stroke-width="2"/>
+                    <path d="M 25 90 L 25 93 M 35 90 L 35 93 M 45 90 L 45 93 M 55 90 L 55 93 M 65 90 L 65 93 M 75 90 L 75 93" stroke="#FBBF24" stroke-width="2"/>
+                </svg>`,
+
+            ucap_salam: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- House Door -->
+                    <rect x="20" y="20" width="60" height="70" rx="4" fill="#B45309"/>
+                    <rect x="26" y="26" width="48" height="58" rx="2" fill="#D97706"/>
+                    <circle cx="64" cy="58" r="4" fill="#FBBF24"/>
+                    <!-- Speech Bubble Salam -->
+                    <rect x="15" y="10" width="70" height="30" rx="10" fill="#FFFFFF" stroke="#0284C7" stroke-width="3"/>
+                    <polygon points="35,40 45,40 38,47" fill="#FFFFFF"/>
+                    <text x="50" y="29" font-size="10" font-weight="bold" fill="#0369A1" text-anchor="middle">Assalamu'alaikum</text>
+                </svg>`,
+
+            // INCORRECT BEHAVIOR GRAPHICS
+            main_hp_larut: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Dark Moon background -->
+                    <rect x="15" y="15" width="70" height="70" rx="12" fill="#1E293B"/>
+                    <path d="M 65 25 A 15 15 0 1 1 50 20 A 12 12 0 0 0 65 25 Z" fill="#FBBF24"/>
+                    <!-- Smartphone shining -->
+                    <rect x="38" y="35" width="24" height="42" rx="4" fill="#000000" stroke="#94A3B8" stroke-width="2"/>
+                    <rect x="41" y="38" width="18" height="30" fill="#38BDF8"/>
+                    <!-- Sad Zzz or Warning cross -->
+                    <text x="50" y="56" font-size="12" font-weight="bold" fill="#EF4444" text-anchor="middle">🎮</text>
+                </svg>`,
+
+            kamar_berantakan: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Bed Unmade -->
+                    <rect x="20" y="30" width="60" height="45" rx="4" fill="#FDA4AF"/>
+                    <path d="M 20 45 Q 40 60 80 40 L 80 75 L 20 75 Z" fill="#F43F5E"/>
+                    <!-- Scattered Toys on Floor -->
+                    <circle cx="25" cy="82" r="6" fill="#3B82F6"/>
+                    <polygon points="65,80 72,88 60,88" fill="#10B981"/>
+                    <rect x="42" y="78" width="10" height="10" fill="#F59E0B"/>
+                </svg>`,
+
+            tidak_cuci_tangan: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Dirty Hand with Germs -->
+                    <path d="M 40 70 L 40 45 C 40 40 45 40 45 45 L 45 35 C 45 30 50 30 50 35 L 50 32 C 50 27 55 27 55 32 L 55 38 C 55 33 60 33 60 38 L 60 65" fill="#FDE68A" stroke="#D97706" stroke-width="3"/>
+                    <!-- Mud/Germ spots -->
+                    <circle cx="48" cy="48" r="4" fill="#78350F"/>
+                    <circle cx="56" cy="55" r="3" fill="#78350F"/>
+                    <circle cx="42" cy="62" r="3.5" fill="#78350F"/>
+                    <!-- Red Cross icon -->
+                    <path d="M 68 20 L 84 36 M 84 20 L 68 36" stroke="#EF4444" stroke-width="5" stroke-linecap="round"/>
+                </svg>`,
+
+            abaikan_azan: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- TV playing games while azan -->
+                    <rect x="20" y="20" width="60" height="45" rx="4" fill="#334155" stroke="#1E293B" stroke-width="3"/>
+                    <rect x="25" y="25" width="50" height="35" fill="#F43F5E"/>
+                    <text x="50" y="47" font-size="16" text-anchor="middle">📺👾</text>
+                    <!-- Clock showing time passed -->
+                    <circle cx="75" cy="75" r="14" fill="#FFFFFF" stroke="#EF4444" stroke-width="3"/>
+                    <path d="M 75 75 L 75 66 M 75 75 L 82 75" stroke="#EF4444" stroke-width="2.5"/>
+                </svg>`,
+
+            masuk_tanpa_salam: `
+                <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto">
+                    <!-- Open door slamming -->
+                    <rect x="15" y="15" width="70" height="70" rx="4" fill="#E2E8F0"/>
+                    <path d="M 25 20 L 70 30 L 70 85 L 25 80 Z" fill="#B45309" stroke="#78350F" stroke-width="2"/>
+                    <!-- Shouting / Noise lines -->
+                    <path d="M 78 35 L 88 30 M 80 50 L 92 50 M 78 65 L 88 70" stroke="#EF4444" stroke-width="3" stroke-linecap="round"/>
+                    <text x="45" y="58" font-size="12" font-weight="bold" fill="#EF4444">💥</text>
+                </svg>`
+        };
+
+        /* ===================================================
+           GAME DATA DEFINITIONS
+        =================================================== */
+        const LEVEL_1_DATA = [
+            { id: 'rule1', title: 'Bangun Pagi', key: 'bangun_pagi', caption: 'Bangun Pagi Subuh' },
+            { id: 'rule2', title: 'Merapikan Kamar Tidur', key: 'rapikan_kamar', caption: 'Merapikan Tempat Tidur' },
+            { id: 'rule3', title: 'Menjaga Kebersihan Diri', key: 'kebersihan_diri', caption: 'Mandi & Mandi Bersih' },
+            { id: 'rule4', title: 'Salat Pada Awal Waktu', key: 'salat_awal_waktu', caption: 'Salat Tepat Waktu' },
+            { id: 'rule5', title: 'Mengucapkan Salam', key: 'ucap_salam', caption: 'Mengucapkan Salam' }
+        ];
+
+        const LEVEL_2_QUIZ = [
+            {
+                question: "Mana gambar perilaku yang SESUAI ATURAN saat masuk rumah?",
+                options: [
+                    { key: 'ucap_salam', text: 'Mengucapkan Salam', correct: true },
+                    { key: 'masuk_tanpa_salam', text: 'Langsung Masuk & Teriak', correct: false }
+                ]
+            },
+            {
+                question: "Mana gambar perilaku yang SESUAI ATURAN setelah bangun tidur?",
+                options: [
+                    { key: 'kamar_berantakan', text: 'Membiarkan Kasur Acak-acakan', correct: false },
+                    { key: 'rapikan_kamar', text: 'Merapikan Tempat Tidur', correct: true }
+                ]
+            },
+            {
+                question: "Mana gambar perilaku yang TIDAK SESUAI ATURAN di rumah?",
+                options: [
+                    { key: 'main_hp_larut', text: 'Main HP Sampai Larut Malam', correct: true },
+                    { key: 'bangun_pagi', text: 'Bangun Pagi Jam 5 Subuh', correct: false }
+                ]
+            },
+            {
+                question: "Mana gambar perilaku yang SESUAI ATURAN sebelum makan & sesudah bermain?",
+                options: [
+                    { key: 'kebersihan_diri', text: 'Menjaga Kebersihan (Cuci Tangan)', correct: true },
+                    { key: 'tidak_cuci_tangan', text: 'Makan Tangan Kotor', correct: false }
+                ]
+            },
+            {
+                question: "Mana gambar perilaku yang SESUAI ATURAN saat mendengar azan?",
+                options: [
+                    { key: 'abaikan_azan', text: 'Tetap Asyik Main Game TV', correct: false },
+                    { key: 'salat_awal_waktu', text: 'Segera Salat Awal Waktu', correct: true }
+                ]
+            }
+        ];
+
+        /* ===================================================
+           STATE MANAGEMENT
+        =================================================== */
+        let state = {
+            studentName: '',
+            scoreL1: 0,
+            scoreL2: 0,
+            selectedRuleId: null,
+            matchedPairs: 0,
+            currentQuizIdx: 0
+        };
+
+        // Screen Switcher
+        function showScreen(screenId) {
+            ['screenWelcome', 'screenLevel1', 'screenLevel2', 'screenResult'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        /* ===================================================
+           START GAME
+        =================================================== */
+        function startGame(e) {
+            e.preventDefault();
+            playSound('click');
+
+            const nameInput = document.getElementById('studentName').value.trim();
+
+            if (!nameInput) return;
+
+            state.studentName = nameInput;
+            state.scoreL1 = 0;
+            state.scoreL2 = 0;
+
+            initLevel1();
+            showScreen('screenLevel1');
+        }
+
+        /* ===================================================
+           LEVEL 1 LOGIC (MATCHING)
+        =================================================== */
+        function initLevel1() {
+            state.matchedPairs = 0;
+            state.scoreL1 = 0;
+            state.selectedRuleId = null;
+            document.getElementById('scoreL1').innerText = '0';
+            document.getElementById('btnNextLevel').classList.add('hidden');
+
+            const rulesListEl = document.getElementById('rulesList');
+            const picsListEl = document.getElementById('picsList');
+
+            rulesListEl.innerHTML = '';
+            picsListEl.innerHTML = '';
+
+            // Shuffle Rules & Pictures
+            const shuffledRules = [...LEVEL_1_DATA].sort(() => Math.random() - 0.5);
+            const shuffledPics = [...LEVEL_1_DATA].sort(() => Math.random() - 0.5);
+
+            // Render Rule Buttons (Left)
+            shuffledRules.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `ruleBtn_${item.id}`;
+                btn.className = `w-full text-left p-3 rounded-2xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 font-bold text-slate-700 shadow transition flex items-center justify-between min-h-[64px] active:scale-95`;
+                btn.onclick = () => selectRule(item.id);
+                btn.innerHTML = `
+                    <span class="text-xs sm:text-sm leading-tight">${item.title}</span>
+                    <span class="status-icon text-sm">⚪</span>
+                `;
+                rulesListEl.appendChild(btn);
+            });
+
+            // Render Picture Cards (Right)
+            shuffledPics.forEach(item => {
+                const card = document.createElement('div');
+                card.id = `picCard_${item.id}`;
+                card.className = `w-full p-2 rounded-2xl border-2 border-sky-300 bg-sky-50 hover:bg-sky-100 text-center cursor-pointer shadow transition flex flex-col items-center justify-center min-h-[64px] active:scale-95`;
+                card.onclick = () => selectPicture(item.id);
+                card.innerHTML = `
+                    ${SVG_GRAPHICS[item.key]}
+                    <span class="text-[11px] font-extrabold text-sky-800 mt-1 leading-tight block">${item.caption}</span>
+                `;
+                picsListEl.appendChild(card);
+            });
+        }
+
+        function selectRule(ruleId) {
+            playSound('click');
+            // Reset previous selection visuals
+            LEVEL_1_DATA.forEach(item => {
+                const el = document.getElementById(`ruleBtn_${item.id}`);
+                if (el && !el.classList.contains('bg-emerald-100')) {
+                    el.classList.remove('border-amber-500', 'bg-amber-200', 'ring-2', 'ring-amber-300');
+                    el.classList.add('border-amber-300', 'bg-amber-50');
+                }
+            });
+
+            state.selectedRuleId = ruleId;
+            const selectedBtn = document.getElementById(`ruleBtn_${ruleId}`);
+            if (selectedBtn && !selectedBtn.classList.contains('bg-emerald-100')) {
+                selectedBtn.classList.remove('border-amber-300', 'bg-amber-50');
+                selectedBtn.classList.add('border-amber-500', 'bg-amber-200', 'ring-2', 'ring-amber-300');
+            }
+        }
+
+        function selectPicture(picId) {
+            if (!state.selectedRuleId) {
+                // If user tapped a picture without selecting a rule first
+                playSound('wrong');
+                const card = document.getElementById(`picCard_${picId}`);
+                card.classList.add('animate-shake');
+                setTimeout(() => card.classList.remove('animate-shake'), 400);
+                return;
+            }
+
+            const ruleId = state.selectedRuleId;
+            const ruleBtn = document.getElementById(`ruleBtn_${ruleId}`);
+            const picCard = document.getElementById(`picCard_${picId}`);
+
+            if (ruleId === picId) {
+                // CORRECT MATCH!
+                playSound('correct');
+                state.scoreL1 += 20;
+                state.matchedPairs += 1;
+                document.getElementById('scoreL1').innerText = state.scoreL1;
+
+                // Disable both matched
+                ruleBtn.className = `w-full text-left p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 text-emerald-800 font-bold shadow flex items-center justify-between min-h-[64px] opacity-90 cursor-default`;
+                ruleBtn.querySelector('.status-icon').innerText = '✅';
+                ruleBtn.onclick = null;
+
+                picCard.className = `w-full p-2 rounded-2xl border-2 border-emerald-500 bg-emerald-100 text-center shadow flex flex-col items-center justify-center min-h-[64px] opacity-90 cursor-default animate-pop`;
+                picCard.onclick = null;
+
+                state.selectedRuleId = null;
+
+                // Check level completion
+                if (state.matchedPairs === LEVEL_1_DATA.length) {
+                    playSound('win');
+                    confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                    document.getElementById('btnNextLevel').classList.remove('hidden');
+                }
+            } else {
+                // WRONG MATCH!
+                playSound('wrong');
+                picCard.classList.add('animate-shake', 'border-red-400', 'bg-red-50');
+                setTimeout(() => {
+                    picCard.classList.remove('animate-shake', 'border-red-400', 'bg-red-50');
+                }, 400);
+            }
+        }
+
+        function goToLevel2() {
+            playSound('click');
+            state.currentQuizIdx = 0;
+            state.scoreL2 = 0;
+            initQuizQuestion();
+            showScreen('screenLevel2');
+        }
+
+        /* ===================================================
+           LEVEL 2 LOGIC (MULTIPLE CHOICE WITH TEXT & PICS)
+        =================================================== */
+        function initQuizQuestion() {
+            const quizData = LEVEL_2_QUIZ[state.currentQuizIdx];
+            document.getElementById('quizProgress').innerText = `${state.currentQuizIdx + 1} / ${LEVEL_2_QUIZ.length}`;
+            document.getElementById('quizQuestion').innerText = quizData.question;
+
+            const feedbackEl = document.getElementById('quizFeedback');
+            feedbackEl.className = 'min-h-[36px] text-center font-bold text-xs py-1.5 px-3 rounded-xl transition-all opacity-0';
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            // Render 2 Option Cards
+            quizData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full p-3 rounded-2xl border-4 border-amber-300 bg-white hover:bg-amber-50 text-center shadow-md transition transform active:scale-95 flex flex-col items-center justify-between min-h-[140px]`;
+                btn.onclick = () => handleQuizAnswer(opt.correct, btn);
+                btn.innerHTML = `
+                    <div class="my-auto">
+                        ${SVG_GRAPHICS[opt.key]}
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-100 w-full">
+                        <span class="text-xs font-bold text-slate-800 leading-tight block">${opt.text}</span>
+                    </div>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleQuizAnswer(isCorrect, selectedBtn) {
+            // Disable all options during animation
+            const buttons = document.querySelectorAll('#quizOptions button');
+            buttons.forEach(b => b.onclick = null);
+
+            const feedbackEl = document.getElementById('quizFeedback');
+
+            if (isCorrect) {
+                playSound('correct');
+                state.scoreL2 += 20;
+                selectedBtn.classList.remove('border-amber-300');
+                selectedBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'ring-4', 'ring-emerald-200');
+
+                feedbackEl.innerText = '✨ HEBAT! Jawabanmu Benar! 👏';
+                feedbackEl.className = 'min-h-[36px] text-center font-bold text-xs py-1.5 px-3 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300 opacity-100 animate-pop';
+            } else {
+                playSound('wrong');
+                selectedBtn.classList.remove('border-amber-300');
+                selectedBtn.classList.add('border-red-500', 'bg-red-50', 'animate-shake');
+
+                feedbackEl.innerText = '❌ Kurang Tepat, Yuk Belajar Lagi! 💪';
+                feedbackEl.className = 'min-h-[36px] text-center font-bold text-xs py-1.5 px-3 rounded-xl bg-red-100 text-red-800 border border-red-300 opacity-100';
+            }
+
+            setTimeout(() => {
+                state.currentQuizIdx += 1;
+                if (state.currentQuizIdx < LEVEL_2_QUIZ.length) {
+                    initQuizQuestion();
+                } else {
+                    finishGame();
+                }
+            }, 1400);
+        }
+
+        /* ===================================================
+           FINAL RESULT & WHATSAPP INTEGRATION
+        =================================================== */
+        function finishGame() {
+            playSound('win');
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+            document.getElementById('resStudentName').innerText = state.studentName;
+            document.getElementById('resStudentClass').innerText = "Kelas 1 SDIT AZ-ZAHRA";
+            document.getElementById('resScore1').innerText = state.scoreL1;
+            document.getElementById('resScore2').innerText = state.scoreL2;
+
+            const totalScore = state.scoreL1 + state.scoreL2;
+            const starEl = document.getElementById('starRating');
+            const msgEl = document.getElementById('resMessage');
+
+            if (totalScore >= 180) {
+                starEl.innerText = '⭐ ⭐ ⭐';
+                msgEl.innerText = "MaaSyaaAllah! Nilai Sempurna! Kamu Anak Sholeh/Sholehah Taat Aturan!";
+            } else if (totalScore >= 120) {
+                starEl.innerText = '⭐ ⭐ ⚪';
+                msgEl.innerText = "Bagus sekali! Kamu sudah memahami aturan di rumah dengan baik!";
+            } else {
+                starEl.innerText = '⭐ ⚪ ⚪';
+                msgEl.innerText = "Tetap semangat ya! Ayo diulangi lagi agar makin paham!";
+            }
+
+            showScreen('screenResult');
+        }
+
+        function getReportMessage() {
+            const totalScore = state.scoreL1 + state.scoreL2;
+            return `Assalamu'alaikum Bunda Ira,
+
+Saya *${state.studentName}* (Siswa Kelas 1 SDIT AZ-ZAHRA)
+Sudah selesai bermain Game Edukasi: *Aturan di Rumahku* (Pendidikan Pancasila)!
+
+📊 *Hasil Nilai Saya:*
+• Level 1 (Memasangkan Aturan): *${state.scoreL1} / 100*
+• Level 2 (Pilih Perilaku Sesuai): *${state.scoreL2} / 100*
+🏆 *Total Skor:* *${totalScore} / 200*
+
+Terima kasih Bunda Ira! ❤️`;
+        }
+
+        function copyResultText() {
+            playSound('click');
+            const message = getReportMessage();
+            
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = message;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            tempTextArea.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                const toast = document.getElementById('copyToast');
+                if (toast) {
+                    toast.classList.remove('hidden');
+                    setTimeout(() => {
+                        toast.classList.add('hidden');
+                    }, 5000);
+                }
+            } catch (err) {
+                console.error('Gagal menyalin:', err);
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        function restartGame() {
+            playSound('click');
+            showScreen('screenWelcome');
+        }
+    </script>
+</body>
+</html>
